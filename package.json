@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@whaledrop/crabtest": "^0.1.3",
+    "base-64": "^1.0.0",
     "ethers": "^5.4.7",
     "next": "11.1.2",
     "next-connect": "^0.11.0",
