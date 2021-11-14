@@ -13,19 +13,19 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href="#">Corruption.js!</a>
+          Welcome to <a href="#">Corruption API!</a>
         </h1>
 
         <p className={styles.description}>
           Try out querying a corruption NFT
         </p>
         <p>
-          <a href="api/corruption/1">&#123;api-url&#125;/corruption/1</a></p>
+          <a href="api/corruption/1">&#123;api-url&#125;/corruption/{id}</a></p>
 
         <div className={styles.grid}>
-          <a href="https://www.npmjs.com/package/@whaledrop/corruptiontest" className={styles.card}>
-            <h2>NPM Package&rarr;</h2>
-            <p>Find in-depth information about Corruption.js features and API.</p>
+          <a href="https://thegraph.com/hosted-service/subgraph/shahruz/corruptions?version=current" className={styles.card}>
+            <h2>Shahruz Graph&rarr;</h2>
+            <p>Subgraph querying.</p>
           </a>
         </div>
       </main>
