@@ -24,7 +24,7 @@ class Corruption {
 
     let insight = corruptionId.split("insight=")[1]
     insight = insight.match(r)
-    let insightInt = parseInt(insight) - 1
+    let insightInt = parseInt(insight) 
 
     let token = await this.Corruption.tokenURI(parseInt(id), insightInt);    
     token = base64.decode(token.split(',')[1])
