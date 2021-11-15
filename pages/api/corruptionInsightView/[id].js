@@ -1,5 +1,5 @@
 
-var Corruption = require('../src/index.js');
+var Corruption = require('../metasrc/index.js');
 
 export default async (req, res) => {
 

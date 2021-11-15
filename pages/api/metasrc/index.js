@@ -15,6 +15,7 @@ class Corruption {
     const Corruption = new ethers.Contract(corruptionAddress, corruptionABI, rpc);
     this.Corruption = Corruption;
   }
+
   async tokenURI(corruptionId) {
     const r = /\d+/;
 
