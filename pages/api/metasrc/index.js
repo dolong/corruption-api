@@ -25,7 +25,7 @@ class Corruption {
     let insight = corruptionId.split("insight=")[1]
     insight = insight.match(r)
 
-    let token = await this.Corruption.tokenURI(parseInt(id), parseInt(insight));    
+    let token = await this.Corruption.tokenURI(parseInt(id), parseInt(insight + 1));    
     token = base64.decode(token.split(',')[1])
     let image = JSON.parse(token).image
     image = base64.decode(image.split(",")[1])
