@@ -25,8 +25,8 @@ export default function Home() {
 
         <div className={styles.grid}>
           <a href="https://thegraph.com/hosted-service/subgraph/shahruz/corruptions?version=current" className={styles.card}>
-            <h2>Shahruz Graph&rarr;</h2>
-            <p>Subgraph querying.</p>
+            <h2>Graph&rarr;</h2>
+            <p>Subgraph querying by shahruz.</p>
           </a>
         </div>
       </main>
@@ -37,7 +37,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Written by Long Do          
+          Written by WhaleDrop         
         </a>
       </footer>
     </div>
