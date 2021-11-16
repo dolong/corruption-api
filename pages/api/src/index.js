@@ -152,6 +152,7 @@ class Corruption {
     }
 
     const delta = currentBlock - lastBlock;
+    const maxMultipler = 24
 
     const multiplier = delta / 200000;
     if (multiplier > maxMultiplier) {
