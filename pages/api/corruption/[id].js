@@ -15,8 +15,11 @@ export default async (req, res) => {
       var attributes = await corruption.attributes(id);
       res.end(JSON.stringify(attributes))
       break
+    case 'OPTIONS':
+      res.end(JSON.stringify({data: 'OK'}));
+      break;
     default:
-      res.setHeader('Allow', ['GET', 'PUT'])
+      res.setHeader('Allow', ['GET', 'OPTIONS'])
       res.status(405).end(`Method ${method} Not Allowed`)
   }
 
