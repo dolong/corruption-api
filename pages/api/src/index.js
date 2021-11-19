@@ -152,7 +152,7 @@ class Corruption {
     }
 
     const delta = currentBlock - lastBlock;
-    const maxMultipler = 24
+    const maxMultiplier = 24
 
     const multiplier = delta / 200000;
     if (multiplier > maxMultiplier) {
@@ -165,7 +165,8 @@ class Corruption {
   }
 
   corruption(corruptionId) {
-    return  corruptionId % 1024;
+    const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["CORRUPTION", corruptionId])   
+    return  hash % 1024;
   }
 
   async attributes(corruptionId) {
