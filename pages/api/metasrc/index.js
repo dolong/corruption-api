@@ -10,7 +10,7 @@ const corruptionAddress = "0x64449bc72c47dc79d840ba724f53afdb3a8d64b6";
 
 class Corruption {
   constructor(rpcProvider) {
-    rpcProvider = "https://mainnet.infura.io/v3/752f065f467246a686ba54b11f77dcfd"
+    rpcProvider = "https://mainnet.infura.io/v3/dc503cd8a1f249a1a6500d0f5f331eca"
     const rpc = new ethers.providers.JsonRpcProvider(rpcProvider);
     const Corruption = new ethers.Contract(corruptionAddress, corruptionABI, rpc);
     this.Corruption = Corruption;

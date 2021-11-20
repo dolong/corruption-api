@@ -39,7 +39,14 @@ const randomStrings = [
   "ILLUMINATI",
   "TEMPTATION",
   "REVELATION",
-  "CORRUPTION"
+  "CORRUPTION",
+  "|",
+  "-",
+  "=",
+  "+",
+  "\\",
+  ":",
+  "~"
 ]
 
 
@@ -47,7 +54,7 @@ const maxMultiplier = 24;
 
 class Corruption {
   constructor(rpcProvider) {
-    rpcProvider = "https://mainnet.infura.io/v3/752f065f467246a686ba54b11f77dcfd"
+    rpcProvider = "https://mainnet.infura.io/v3/dc503cd8a1f249a1a6500d0f5f331eca"
     const rpc = new ethers.providers.JsonRpcProvider(rpcProvider);
     const Corruption = new ethers.Contract(corruptionAddress, corruptionABI, rpc);
     this.Corruption = Corruption;
@@ -133,6 +140,15 @@ class Corruption {
     return randomStrings[int];
   }
 
+  
+  async checker(corruptionId) {
+    const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["CHECKER", corruptionId])      
+    let intString = (web3.utils.hexToNumberString(hash))
+    let int = this.modulo(intString, 7) + 37
+    return randomStrings[int];
+  }
+
+
   async corruptor(corruptionId) {
     const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["CORRUPTOR", corruptionId])      
     let intString = (web3.utils.hexToNumberString(hash))
@@ -142,7 +158,7 @@ class Corruption {
 
   async unsavedInsight(tokenID) {
     const insightMap = await this.insightMap(tokenID) 
-    var w3 = new web3("https://mainnet.infura.io/v3/752f065f467246a686ba54b11f77dcfd");    
+    var w3 = new web3("https://mainnet.infura.io/v3/dc503cd8a1f249a1a6500d0f5f331eca");    
     const currentBlock = await w3.eth.getBlockNumber()
     const lastBlock = insightMap.lastSavedBlock
     const savedXP = insightMap.savedXP
@@ -178,6 +194,7 @@ class Corruption {
     const corruptor = await this.corruptor(corruptionId);
     const corruption = this.corruption(corruptionId);
     const unsavedInsight = await this.unsavedInsight(corruptionId);
+    const checker = await this.checker(corruptionId);
     return {
       id: corruptionId,
       insight: insight,
@@ -187,7 +204,8 @@ class Corruption {
       hiddenAttribute: hiddenAttribute,
       border: border,
       corruptor: corruptor,
-      corruption: corruption
+      corruption: corruption,
+      checker: checker,
     }
   }
   async numberOfNFTsInWallet(address) {
