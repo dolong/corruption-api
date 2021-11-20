@@ -1,234 +1,365 @@
+/*
+ This file is part of web3.js.
 
-const ethers = require("ethers");
-const base64 = require('base-64');
-const web3 = require ('web3');
-const { corruptionABI } = require("./abi.js");
-const corruptionAddress = "0x5bdf397bb2912859dbd8011f320a222f79a28d2e";
+ web3.js is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
+ web3.js is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Lesser General Public License for more details.
 
-const randomStrings = [
-  "/",
-  "$",
-  "|",
-  "8",
-  "_",
-  "?",
-  "#",
-  "%",
-  "^",
-  "~",
-  ":",
-  "#022FB7",
-  "#262A36",
-  "#A802B7",
-  "#3CB702",
-  "#B76F02",
-  "#B70284",
-  "#0D1302",
-  "#020A13",
-  "#130202",
-  "#1A1616",
-  "#000000",
-  "#040A27",  
-  "GENERATION",
-  "INDIVIDUAL",
-  "TECHNOLOGY",
-  "EVERYTHING",
-  "EVERYWHERE",
-  "UNDERWORLD",
-  "ILLUMINATI",
-  "TEMPTATION",
-  "REVELATION",
-  "CORRUPTION",
-  "|",
-  "-",
-  "=",
-  "+",
-  "\\",
-  ":",
-  "~"
-]
-
-
-const maxMultiplier = 24;
-
-class Corruption {
-  constructor(rpcProvider) {
-    rpcProvider = "https://mainnet.infura.io/v3/dc503cd8a1f249a1a6500d0f5f331eca"
-    const rpc = new ethers.providers.JsonRpcProvider(rpcProvider);
-    const Corruption = new ethers.Contract(corruptionAddress, corruptionABI, rpc);
-    this.Corruption = Corruption;
-  }
-
-  /*
-  * Need to write this for big int modulos
-  */
-  modulo (divident, divisor) {
-    var cDivident = '';
-    var cRest = '';
-
-    for (var i in divident ) {
-        var cChar = divident[i];
-        var cOperator = cRest + '' + cDivident + '' + cChar;
-
-        if ( cOperator < parseInt(divisor) ) {
-                cDivident += '' + cChar;
-        } else {
-                cRest = cOperator % divisor;
-                if ( cRest == 0 ) {
-                    cRest = '';
-                }
-                cDivident = '';
-        }
-
+ You should have received a copy of the GNU Lesser General Public License
+ along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * @file index.js
+ * @author Marek Kotewicz <marek@parity.io>
+ * @author Fabian Vogelsteller <fabian@frozeman.de>
+ * @date 2018
+ */
+var Buffer = require('buffer').Buffer;
+var utils = require('web3-utils');
+var EthersAbiCoder = require('@ethersproject/abi').AbiCoder;
+var ParamType = require('@ethersproject/abi').ParamType;
+var ethersAbiCoder = new EthersAbiCoder(function (type, value) {
+    if (type.match(/^u?int/) && !Array.isArray(value) && (!(!!value && typeof value === 'object') || value.constructor.name !== 'BN')) {
+        return value.toString();
     }
-    cRest += '' + cDivident;
-    if (cRest == '') {
-        cRest = 0;
-    }
-    return cRest;
-  }
-
-  async insight(corruptionId) {
-    let insight = await this.Corruption.insight(corruptionId);    
-    return JSON.parse(insight);
-  }
-
-  async insightMap(corruptionId) {
-    let insightMap = await this.Corruption.insightMap(corruptionId);
-    const insightMapParsed = {
-      savedXP: JSON.parse(insightMap[0]),
-      lastSavedBlock : JSON.parse(insightMap[1])
-    }
-    return insightMapParsed;
-  }
-
-
-  async tokenURI(corruptionId) {
-    let token = await this.Corruption.tokenURI(corruptionId);    
-    token = base64.decode(token.split(',')[1])
-    let image = JSON.parse(token).image
-    image = base64.decode(image.split(",")[1])
-    return image;
-  }
-
-  async phrase(corruptionId) {
-    const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["PHRASE", corruptionId])      
-    let intString = (web3.utils.hexToNumberString(hash))
-    let int = parseInt(this.modulo(intString, 10)) + 23
-    return randomStrings[int];
-  }
-  
-  async backgroundColor(corruptionId) {
-    const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["BGCOLOR", corruptionId])    
-    let intString = (web3.utils.hexToNumberString(hash))
-    let int = parseInt(this.modulo(intString, 6))
-    return randomStrings[int];
-  }
-
-  async hiddenAttribute(corruptionId) {
-    const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["FGCOLOR", corruptionId])      
-    let intString = (web3.utils.hexToNumberString(hash))
-    let int = parseInt(this.modulo(intString, 6)) + 27
-    return randomStrings[int];
-  }
-  
-  async border(corruptionId) {
-    const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["BORDER", corruptionId])      
-    let intString = (web3.utils.hexToNumberString(hash))
-    let int = this.modulo(intString, 11)
-    return randomStrings[int];
-  }
-
-  
-  async checker(corruptionId) {
-    const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["CHECKER", corruptionId])      
-    let intString = (web3.utils.hexToNumberString(hash))
-    let int = this.modulo(intString, 7) + 37
-    return randomStrings[int];
-  }
-
-
-  async corruptor(corruptionId) {
-    const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["CORRUPTOR", corruptionId])      
-    let intString = (web3.utils.hexToNumberString(hash))
-    let int = this.modulo(intString, 11)
-    return randomStrings[int];
-  }
-
-  async unsavedInsight(tokenID) {
-    const insightMap = await this.insightMap(tokenID) 
-    var w3 = new web3("https://mainnet.infura.io/v3/dc503cd8a1f249a1a6500d0f5f331eca");    
-    const currentBlock = await w3.eth.getBlockNumber()
-    const lastBlock = insightMap.lastSavedBlock
-    const savedXP = insightMap.savedXP
-    
-    if (lastBlock == 0) {
-        return 0;
-    }
-
-    const delta = currentBlock - lastBlock;
-    const maxMultiplier = 24
-
-    const multiplier = delta / 200000;
-    if (multiplier > maxMultiplier) {
-        multiplier = maxMultiplier;
-    }
-
-    const total = savedXP + (delta * (multiplier + 1) / 10000);
-
-    return total;
-  }
-
-  corruption(corruptionId) {
-    const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["CORRUPTION", corruptionId])   
-    return  hash % 1024;
-  }
-
-  async attributes(corruptionId) {
-    const insight = await this.insight(corruptionId);
-    const insightMap = await this.insightMap(corruptionId);
-    const phrase = await this.phrase(corruptionId);
-    const hiddenAttribute = await this.hiddenAttribute(corruptionId);
-    const border = await this.border(corruptionId);
-    const corruptor = await this.corruptor(corruptionId);
-    const corruption = this.corruption(corruptionId);
-    const unsavedInsight = await this.unsavedInsight(corruptionId);
-    const checker = await this.checker(corruptionId);
-    return {
-      id: corruptionId,
-      insight: insight,
-      insightMap: insightMap,
-      unsavedInsight: unsavedInsight,
-      phrase: phrase,
-      hiddenAttribute: hiddenAttribute,
-      border: border,
-      corruptor: corruptor,
-      corruption: corruption,
-      checker: checker,
-    }
-  }
-  async numberOfNFTsInWallet(address) {
-    let balance = await this.Corruption.balanceOf(address);
-
-    return balance.toNumber();
-  }
-
-  async corruptionIdsInWallet(address) {
-    const numberOfNFTs = await this.numberOfNFTsInWallet(address);
-    let corruptionIds = [];
-    let tasks = [];
-    for (var i = 0;i < numberOfNFTs; i++) {
-      tasks.push(this.Corruption.tokenOfOwnerByIndex(address, i));
-    }
-
-    const data = await Promise.all(tasks);
-    for (const corruptionIdBN of data) {
-      corruptionIds.push(corruptionIdBN.toString());
-    }
-
-    return corruptionIds;
-  }
+    return value;
+});
+// result method
+function Result() {
 }
-
-module.exports = Corruption;
+/**
+ * ABICoder prototype should be used to encode/decode solidity params of any type
+ */
+var ABICoder = function () {
+};
+/**
+ * Encodes the function name to its ABI representation, which are the first 4 bytes of the sha3 of the function name including  types.
+ *
+ * @method encodeFunctionSignature
+ * @param {String|Object} functionName
+ * @return {String} encoded function name
+ */
+ABICoder.prototype.encodeFunctionSignature = function (functionName) {
+    if (typeof functionName === 'function' || typeof functionName === 'object' && functionName) {
+        functionName = utils._jsonInterfaceMethodToString(functionName);
+    }
+    return utils.sha3(functionName).slice(0, 10);
+};
+/**
+ * Encodes the function name to its ABI representation, which are the first 4 bytes of the sha3 of the function name including  types.
+ *
+ * @method encodeEventSignature
+ * @param {String|Object} functionName
+ * @return {String} encoded function name
+ */
+ABICoder.prototype.encodeEventSignature = function (functionName) {
+    if (typeof functionName === 'function' || typeof functionName === 'object' && functionName) {
+        functionName = utils._jsonInterfaceMethodToString(functionName);
+    }
+    return utils.sha3(functionName);
+};
+/**
+ * Should be used to encode plain param
+ *
+ * @method encodeParameter
+ *
+ * @param {String|Object} type
+ * @param {any} param
+ *
+ * @return {String} encoded plain param
+ */
+ABICoder.prototype.encodeParameter = function (type, param) {
+    return this.encodeParameters([type], [param]);
+};
+/**
+ * Should be used to encode list of params
+ *
+ * @method encodeParameters
+ *
+ * @param {Array<String|Object>} types
+ * @param {Array<any>} params
+ *
+ * @return {String} encoded list of params
+ */
+ABICoder.prototype.encodeParameters = function (types, params) {
+    var self = this;
+    types = self.mapTypes(types);
+    params = params.map(function (param, index) {
+        let type = types[index];
+        if (typeof type === 'object' && type.type) {
+            // We may get a named type of shape {name, type}
+            type = type.type;
+        }
+        param = self.formatParam(type, param);
+        // Format params for tuples
+        if (typeof type === 'string' && type.includes('tuple')) {
+            const coder = ethersAbiCoder._getCoder(ParamType.from(type));
+            const modifyParams = (coder, param) => {
+                if (coder.name === 'array') {
+                    return param.map(p => modifyParams(ethersAbiCoder._getCoder(ParamType.from(coder.type.replace('[]', ''))), p));
+                }
+                coder.coders.forEach((c, i) => {
+                    if (c.name === 'tuple') {
+                        modifyParams(c, param[i]);
+                    }
+                    else {
+                        param[i] = self.formatParam(c.name, param[i]);
+                    }
+                });
+            };
+            modifyParams(coder, param);
+        }
+        return param;
+    });
+    return ethersAbiCoder.encode(types, params);
+};
+/**
+ * Map types if simplified format is used
+ *
+ * @method mapTypes
+ * @param {Array} types
+ * @return {Array}
+ */
+ABICoder.prototype.mapTypes = function (types) {
+    var self = this;
+    var mappedTypes = [];
+    types.forEach(function (type) {
+        // Remap `function` type params to bytes24 since Ethers does not
+        // recognize former type. Solidity docs say `Function` is a bytes24
+        // encoding the contract address followed by the function selector hash.
+        if (typeof type === 'object' && type.type === 'function') {
+            type = Object.assign({}, type, { type: "bytes24" });
+        }
+        if (self.isSimplifiedStructFormat(type)) {
+            var structName = Object.keys(type)[0];
+            mappedTypes.push(Object.assign(self.mapStructNameAndType(structName), {
+                components: self.mapStructToCoderFormat(type[structName])
+            }));
+            return;
+        }
+        mappedTypes.push(type);
+    });
+    return mappedTypes;
+};
+/**
+ * Check if type is simplified struct format
+ *
+ * @method isSimplifiedStructFormat
+ * @param {string | Object} type
+ * @returns {boolean}
+ */
+ABICoder.prototype.isSimplifiedStructFormat = function (type) {
+    return typeof type === 'object' && typeof type.components === 'undefined' && typeof type.name === 'undefined';
+};
+/**
+ * Maps the correct tuple type and name when the simplified format in encode/decodeParameter is used
+ *
+ * @method mapStructNameAndType
+ * @param {string} structName
+ * @return {{type: string, name: *}}
+ */
+ABICoder.prototype.mapStructNameAndType = function (structName) {
+    var type = 'tuple';
+    if (structName.indexOf('[]') > -1) {
+        type = 'tuple[]';
+        structName = structName.slice(0, -2);
+    }
+    return { type: type, name: structName };
+};
+/**
+ * Maps the simplified format in to the expected format of the ABICoder
+ *
+ * @method mapStructToCoderFormat
+ * @param {Object} struct
+ * @return {Array}
+ */
+ABICoder.prototype.mapStructToCoderFormat = function (struct) {
+    var self = this;
+    var components = [];
+    Object.keys(struct).forEach(function (key) {
+        if (typeof struct[key] === 'object') {
+            components.push(Object.assign(self.mapStructNameAndType(key), {
+                components: self.mapStructToCoderFormat(struct[key])
+            }));
+            return;
+        }
+        components.push({
+            name: key,
+            type: struct[key]
+        });
+    });
+    return components;
+};
+/**
+ * Handle some formatting of params for backwards compatability with Ethers V4
+ *
+ * @method formatParam
+ * @param {String} - type
+ * @param {any} - param
+ * @return {any} - The formatted param
+ */
+ABICoder.prototype.formatParam = function (type, param) {
+    const paramTypeBytes = new RegExp(/^bytes([0-9]*)$/);
+    const paramTypeBytesArray = new RegExp(/^bytes([0-9]*)\[\]$/);
+    const paramTypeNumber = new RegExp(/^(u?int)([0-9]*)$/);
+    const paramTypeNumberArray = new RegExp(/^(u?int)([0-9]*)\[\]$/);
+    // Format BN to string
+    if (utils.isBN(param) || utils.isBigNumber(param)) {
+        return param.toString(10);
+    }
+    if (type.match(paramTypeBytesArray) || type.match(paramTypeNumberArray)) {
+        return param.map(p => this.formatParam(type.replace('[]', ''), p));
+    }
+    // Format correct width for u?int[0-9]*
+    let match = type.match(paramTypeNumber);
+    if (match) {
+        let size = parseInt(match[2] || "256");
+        if (size / 8 < param.length) {
+            // pad to correct bit width
+            param = utils.leftPad(param, size);
+        }
+    }
+    // Format correct length for bytes[0-9]+
+    match = type.match(paramTypeBytes);
+    if (match) {
+        if (Buffer.isBuffer(param)) {
+            param = utils.toHex(param);
+        }
+        // format to correct length
+        let size = parseInt(match[1]);
+        if (size) {
+            let maxSize = size * 2;
+            if (param.substring(0, 2) === '0x') {
+                maxSize += 2;
+            }
+            if (param.length < maxSize) {
+                // pad to correct length
+                param = utils.rightPad(param, size * 2);
+            }
+        }
+        // format odd-length bytes to even-length
+        if (param.length % 2 === 1) {
+            param = '0x0' + param.substring(2);
+        }
+    }
+    return param;
+};
+/**
+ * Encodes a function call from its json interface and parameters.
+ *
+ * @method encodeFunctionCall
+ * @param {Array} jsonInterface
+ * @param {Array} params
+ * @return {String} The encoded ABI for this function call
+ */
+ABICoder.prototype.encodeFunctionCall = function (jsonInterface, params) {
+    return this.encodeFunctionSignature(jsonInterface) + this.encodeParameters(jsonInterface.inputs, params).replace('0x', '');
+};
+/**
+ * Should be used to decode bytes to plain param
+ *
+ * @method decodeParameter
+ * @param {String} type
+ * @param {String} bytes
+ * @return {Object} plain param
+ */
+ABICoder.prototype.decodeParameter = function (type, bytes) {
+    return this.decodeParameters([type], bytes)[0];
+};
+/**
+ * Should be used to decode list of params
+ *
+ * @method decodeParameter
+ * @param {Array} outputs
+ * @param {String} bytes
+ * @return {Array} array of plain params
+ */
+ABICoder.prototype.decodeParameters = function (outputs, bytes) {
+    return this.decodeParametersWith(outputs, bytes, false);
+};
+/**
+ * Should be used to decode list of params
+ *
+ * @method decodeParameter
+ * @param {Array} outputs
+ * @param {String} bytes
+ * @param {Boolean} loose
+ * @return {Array} array of plain params
+ */
+ABICoder.prototype.decodeParametersWith = function (outputs, bytes, loose) {
+    if (outputs.length > 0 && (!bytes || bytes === '0x' || bytes === '0X')) {
+        throw new Error('Returned values aren\'t valid, did it run Out of Gas? ' +
+            'You might also see this error if you are not using the ' +
+            'correct ABI for the contract you are retrieving data from, ' +
+            'requesting data from a block number that does not exist, ' +
+            'or querying a node which is not fully synced.');
+    }
+    var res = ethersAbiCoder.decode(this.mapTypes(outputs), '0x' + bytes.replace(/0x/i, ''), loose);
+    var returnValue = new Result();
+    returnValue.__length__ = 0;
+    outputs.forEach(function (output, i) {
+        var decodedValue = res[returnValue.__length__];
+        decodedValue = (decodedValue === '0x') ? null : decodedValue;
+        returnValue[i] = decodedValue;
+        if ((typeof output === 'function' || !!output && typeof output === 'object') && output.name) {
+            returnValue[output.name] = decodedValue;
+        }
+        returnValue.__length__++;
+    });
+    return returnValue;
+};
+/**
+ * Decodes events non- and indexed parameters.
+ *
+ * @method decodeLog
+ * @param {Object} inputs
+ * @param {String} data
+ * @param {Array} topics
+ * @return {Array} array of plain params
+ */
+ABICoder.prototype.decodeLog = function (inputs, data, topics) {
+    var _this = this;
+    topics = Array.isArray(topics) ? topics : [topics];
+    data = data || '';
+    var notIndexedInputs = [];
+    var indexedParams = [];
+    var topicCount = 0;
+    // TODO check for anonymous logs?
+    inputs.forEach(function (input, i) {
+        if (input.indexed) {
+            indexedParams[i] = (['bool', 'int', 'uint', 'address', 'fixed', 'ufixed'].find(function (staticType) {
+                return input.type.indexOf(staticType) !== -1;
+            })) ? _this.decodeParameter(input.type, topics[topicCount]) : topics[topicCount];
+            topicCount++;
+        }
+        else {
+            notIndexedInputs[i] = input;
+        }
+    });
+    var nonIndexedData = data;
+    var notIndexedParams = (nonIndexedData) ? this.decodeParametersWith(notIndexedInputs, nonIndexedData, true) : [];
+    var returnValue = new Result();
+    returnValue.__length__ = 0;
+    inputs.forEach(function (res, i) {
+        returnValue[i] = (res.type === 'string') ? '' : null;
+        if (typeof notIndexedParams[i] !== 'undefined') {
+            returnValue[i] = notIndexedParams[i];
+        }
+        if (typeof indexedParams[i] !== 'undefined') {
+            returnValue[i] = indexedParams[i];
+        }
+        if (res.name) {
+            returnValue[res.name] = returnValue[i];
+        }
+        returnValue.__length__++;
+    });
+    return returnValue;
+};
+var coder = new ABICoder();
+module.exports = coder;
