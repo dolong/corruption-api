@@ -9,8 +9,8 @@ export default async (req, res) => {
   } = req
   
   
-  let id = corruptionId.split("id=")[1]
-  id = id.match(r)
+  let cid = corruptionId.split("id=")[1]
+  cid = cid.match(r)
 
   let insight = corruptionId.split("insight=")[1]
   insight = insight.match(r)
