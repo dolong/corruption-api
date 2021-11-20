@@ -151,9 +151,10 @@ class Corruption {
 
   async corruptor(corruptionId) {
     const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["CORRUPTOR", corruptionId])      
+    
     let intString = (web3.utils.hexToNumberString(hash))
     let int = this.modulo(intString, 11)
-    return randomStrings[int];
+    return randomStrings[(int)];
   }
 
   async unsavedInsight(tokenID) {
@@ -180,9 +181,34 @@ class Corruption {
     return total;
   }
 
-  corruption(corruptionId) {
+  corruption(corruptionId) { 
     const hash = ethers.utils.solidityKeccak256(['string', 'uint256'], ["CORRUPTION", corruptionId])   
-    return  hash % 1024;
+    let intString = (web3.utils.hexToNumberString(hash))    
+    return  this.modulo(intString, 1024);
+  }
+
+  async attributesNoInfura(start, end) {
+    let returnArray = []
+    for (let i = start; i < end; i++) {
+      let corruptionId = i;
+      const phrase = await this.phrase(corruptionId);
+      const hiddenAttribute = await this.hiddenAttribute(corruptionId);
+      const border = await this.border(corruptionId);
+      const corruptor = await this.corruptor(corruptionId);
+      const corruption = await this.corruption(corruptionId);
+      const checker = await this.checker(corruptionId);
+      returnArray.push({
+          id: corruptionId,
+          phrase: phrase,
+          hiddenAttribute: hiddenAttribute,
+          border: border,
+          corruptor: corruptor,
+          corruption: corruption,
+          checker: checker,
+        });
+      }
+    
+    return returnArray
   }
 
   async attributes(corruptionId) {
@@ -198,7 +224,7 @@ class Corruption {
     return {
       id: corruptionId,
       insight: insight,
-      insightMap: insightMap,
+      insightMap: insightMap,      
       unsavedInsight: unsavedInsight,
       phrase: phrase,
       hiddenAttribute: hiddenAttribute,
